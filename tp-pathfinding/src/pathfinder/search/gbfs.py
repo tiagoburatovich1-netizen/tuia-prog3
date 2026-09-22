@@ -4,6 +4,18 @@ from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 
 
+@staticmethod
+def heuristic(node: Node, grid: Grid) -> int:
+    """
+    Calcula la distancia de Manhattan como heurística
+    h(n) = |x_actual - x_objetivo| + |y_actual - y_objetivo|
+    """
+    current_x, current_y = node.state
+    end_x, end_y = grid.end
+    
+    return abs(current_x - end_x) + abs(current_y - end_y)
+
+
 class GreedyBestFirstSearch:
     @staticmethod
     def search(grid: Grid) -> Solution:
@@ -23,7 +35,27 @@ class GreedyBestFirstSearch:
         reached[root.state] = root.cost
 
         # Initialize frontier with the root node
-        # TODO Complete the rest!!
-        # ...
+        frontier = PriorityQueueFrontier()
+        frontier.add(root, priority=heuristic(root, grid))
 
+        while not frontier.is_empty():
+            node = frontier.pop()
+            # test objetivo
+            if grid.objective_test(node.state):
+                return Solution(node, reached) 
+             
+            for action in grid.actions(node.state):
+                successor_state = grid.result(node.state, action)
+                successor_cost = node.cost + grid.individual_cost(node.state, action)
+
+                if (successor_state not in reached or successor_cost < reached[successor_state]):
+                    son = Node(
+                        "",
+                        successor_state,
+                        cost=successor_cost,
+                        parent=node,
+                        action=action,
+                    )
+                    reached[successor_state] = son.cost
+                    frontier.add(son, priority=heuristic(son, grid))
         return NoSolution(reached)

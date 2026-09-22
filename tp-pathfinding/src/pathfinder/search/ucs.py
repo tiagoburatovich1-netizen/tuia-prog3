@@ -24,11 +24,12 @@ class UniformCostSearch:
 
         # Initialize frontier with the root node
         frontier = PriorityQueueFrontier()
-        frontier.add(root)
+        frontier.add(root, priority=root.cost)
 
         reached[root.state] = root.cost
 
         while not frontier.is_empty():
+            # extrae el nodo con menor costo    
             node = frontier.pop()
             # test objetivo 
             if grid.objective_test(node.state):
