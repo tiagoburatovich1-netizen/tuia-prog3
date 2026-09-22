@@ -22,6 +22,10 @@ class BreadthFirstSearch:
         reached = {}
         reached[root.state] = True
 
+        # test objetivo
+        if grid.objective_test(root.state):
+            return Solution(root, reached)
+
         # Initialize frontier with the root node
         frontier = QueueFrontier()
         frontier.add(root)
@@ -29,31 +33,32 @@ class BreadthFirstSearch:
         while not frontier.is_empty():
             node = frontier.remove()
 
-            #test objetivo
+            # test objetivo
             if grid.objective_test(node.state):
                 return Solution(node, reached)
 
-            #explora las posibles acciones
+            # explora las posibles acciones
             for action in grid.actions(node.state):
                 successor_state = grid.result(node.state, action)
 
-                #omite a los estados ya alcanzados
-                if successor_state in reached:
-                    continue
-                #marca el sucesor como alcanzado
-                reached[successor_state] = True
+                # omite a los estados ya alcanzados
+                if successor_state not in reached:
+                    # crea el nodo hijo
+                    son = Node(
+                        "",
+                        successor_state,
+                        cost=node.cost + grid.individual_cost(node.state, action),
+                        parent=node,
+                        action=action,
+                    )
+                    # test objetivo
+                    if grid.objective_test(successor_state):
+                        return Solution(son, reached)
 
-                #crea el nodo hijo
-                son = Node(
-                    "",
-                    state=successor_state,
-                    cost=node.cost + grid.individual_cost(node.state, action),
-                    parent=node,
-                    action=action,
-                )
+                    # marca al sucesor como alcanzado
+                    reached[successor_state] = True
 
-                #agrega el hijo a la frontera
-                frontier.add(son)
-
-        #no se encontro solucion
+                    # agrega el hijo a la frontera
+                    frontier.add(son)
+        # no se encontro solucion
         return NoSolution(reached)
