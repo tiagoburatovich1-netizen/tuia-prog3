@@ -5,7 +5,7 @@ from ..models.node import Node
 
 
 def heuristic(state=tuple, end=tuple)->int:
-    return abs(state[0]- end[0]+abs(state[1]-end[1]))
+    return abs(state[0]- end[0]) + abs(state[1]-end[1])
 
 class AStarSearch:
     @staticmethod
